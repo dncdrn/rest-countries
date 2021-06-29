@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Avatar, Card, Col, Input, Row, Skeleton, Table } from "antd";
+import { Avatar, Card, Input, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getAllCountries } from "./service/countriesAPI";
 import "./App.css";
 import "antd/dist/antd.css";
 import Title from "antd/lib/typography/Title";
 import BarGraph from "./components/BarGraph";
+import { LoadingOutlined } from "@ant-design/icons";
 
 function App() {
   const favorites = JSON.parse(localStorage.getItem("favorites"));
@@ -15,6 +16,7 @@ function App() {
   const [filteredCountriesArr, setFilteredCountriesArr] = useState([]);
   const [selectedCountryKeys, setSelectedCountryKeys] = useState(favorites);
   const [faveCountriesArr, setFaveCountriesArr] = useState();
+  const [isTableLoading, setIsTableLoading] = useState(true);
 
   const countriesTableColumn = [
     {
@@ -38,14 +40,14 @@ function App() {
         ) : (
           name
         ),
-      sorter: (a, b) => a.name.length - b.name.length,
+      sorter: (a, b) => a.name.localeCompare(b.name),
       sortDirections: ["descend"],
     },
     {
       title: "Region",
       dataIndex: "region",
       key: "region",
-      sorter: (a, b) => a.region.length - b.region.length,
+      sorter: (a, b) => a.region.localeCompare(b.region),
       sortDirections: ["descend"],
     },
     {
@@ -62,9 +64,7 @@ function App() {
         ) : (
           capital
         ),
-      sorter: (a, b) => {
-        return a.capital.length - b.capital.length;
-      },
+      sorter: (a, b) => a.capital.localeCompare(b.capital),
       sortDirections: ["descend"],
     },
   ];
@@ -75,6 +75,7 @@ function App() {
       countriesResult.forEach(function (element, index) {
         element.key = index;
       });
+      setIsTableLoading(false);
       setCountriesArr(countriesResult);
       setFilteredCountriesArr(countriesResult);
     })();
@@ -84,6 +85,10 @@ function App() {
     type: "checkbox",
     selectedRowKeys: selectedCountryKeys,
     onChange: onSelectChange,
+  };
+  const tableLoading = {
+    spinning: isTableLoading,
+    indicator: <LoadingOutlined style={{ fontSize: 60 }} spin />,
   };
 
   function onSelectChange(selectedRowKeys) {
@@ -147,6 +152,7 @@ function App() {
             dataSource={filteredCountriesArr}
             columns={countriesTableColumn}
             scroll={{ y: 500 }}
+            loading={tableLoading}
           />
         </Card>
 
