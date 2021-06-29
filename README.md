@@ -1,6 +1,12 @@
-# Getting Started with Create React App
+# REST Countries
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## How to run the app
+- `git clone https://github.com/dncdrn/rest-countries`
+- in cli `npm i`
+- then `npm run start`
+
 
 ## Available Scripts
 
