@@ -1,9 +1,11 @@
 .App {
-  padding: 50px;
+  padding: 15px;
 }
 
 .border-round {
   border-radius: 20px !important;
+  flex: 1;
+  margin: 20px !important;
 }
 .App-logo {
   height: 40vmin;
@@ -44,4 +46,17 @@
 }
 .table-striped-rows thead {
   background-color: #f1f1f1;
+}
+.empty-favorites {
+  min-height: 690px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  flex-flow: wrap;
+  justify-content: space-evenly;
 }
