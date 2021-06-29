@@ -4,6 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## How to run the app
 - `git clone https://github.com/dncdrn/rest-countries`
+- go to rest-countries folder
 - in cli `npm i`
 - then `npm run start`
 
