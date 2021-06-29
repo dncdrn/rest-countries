@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Highlighter from "react-highlight-words";
-import Chart from "react-google-charts";
-import { Avatar, Card, Col, Input, Row, Skeleton, Space, Table } from "antd";
+import { Avatar, Card, Col, Input, Row, Skeleton, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getAllCountries } from "./service/countriesAPI";
 import "./App.css";
 import "antd/dist/antd.css";
 import Title from "antd/lib/typography/Title";
+import BarGraph from "./components/BarGraph";
 
 function App() {
   const favorites = JSON.parse(localStorage.getItem("favorites"));
   const [countriesArr, setCountriesArr] = useState([]);
-  const [searchText, setSearchText] = useState("");
+  const [searchedText, setSearchText] = useState("");
   const [filteredCountriesArr, setFilteredCountriesArr] = useState([]);
-  const [selectedRowKeyss, setSelectedRowKeyss] = useState(favorites);
+  const [selectedCountryKeys, setSelectedCountryKeys] = useState(favorites);
   const [faveCountriesArr, setFaveCountriesArr] = useState();
 
   const countriesTableColumn = [
@@ -28,17 +28,16 @@ function App() {
       dataIndex: "name",
       key: "name",
       render: (name) =>
-        searchText ? (
+        searchedText ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[searchText]}
+            searchWords={[searchedText]}
             autoEscape
             textToHighlight={name}
           />
         ) : (
           name
         ),
-      onFilter: (value, record) => record.name.indexOf(value) === 0,
       sorter: (a, b) => a.name.length - b.name.length,
       sortDirections: ["descend"],
     },
@@ -46,24 +45,26 @@ function App() {
       title: "Region",
       dataIndex: "region",
       key: "region",
-      sorter: (a, b) => a.name.length - b.name.length,
+      sorter: (a, b) => a.region.length - b.region.length,
       sortDirections: ["descend"],
     },
     {
       title: "Capital",
       dataIndex: "capital",
       render: (capital) =>
-        searchText ? (
+        searchedText ? (
           <Highlighter
             highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[searchText]}
+            searchWords={[searchedText]}
             autoEscape
             textToHighlight={capital}
           />
         ) : (
           capital
         ),
-      sorter: (a, b) => a.name.length - b.name.length,
+      sorter: (a, b) => {
+        return a.capital.length - b.capital.length;
+      },
       sortDirections: ["descend"],
     },
   ];
@@ -71,8 +72,8 @@ function App() {
   useEffect(() => {
     (async function () {
       const countriesResult = await getAllCountries();
-      countriesResult.forEach(function (element, idx) {
-        element.key = idx;
+      countriesResult.forEach(function (element, index) {
+        element.key = index;
       });
       setCountriesArr(countriesResult);
       setFilteredCountriesArr(countriesResult);
@@ -81,13 +82,13 @@ function App() {
 
   const rowSelection = {
     type: "checkbox",
-    selectedRowKeys: selectedRowKeyss,
+    selectedRowKeys: selectedCountryKeys,
     onChange: onSelectChange,
   };
 
   function onSelectChange(selectedRowKeys) {
     localStorage.setItem("favorites", JSON.stringify(selectedRowKeys));
-    setSelectedRowKeyss(selectedRowKeys);
+    setSelectedCountryKeys(selectedRowKeys);
   }
 
   function handleOnSearch(e) {
@@ -102,82 +103,65 @@ function App() {
   }
 
   useEffect(() => {
-    if (countriesArr && selectedRowKeyss.length) {
+    if (countriesArr && selectedCountryKeys && selectedCountryKeys.length) {
       const selectedCountriesArr = countriesArr.filter((country) =>
-        selectedRowKeyss.includes(country.key)
+        selectedCountryKeys.includes(country.key)
       );
       const faveCountriesBarGraphDataFormat = selectedCountriesArr.map(
         (country) => [country.name, country.population]
       );
-      faveCountriesBarGraphDataFormat.unshift(["Country", "Total Population"]);
       setFaveCountriesArr(faveCountriesBarGraphDataFormat);
+    } else {
+      setFaveCountriesArr();
     }
-  }, [selectedRowKeyss, countriesArr]);
+  }, [selectedCountryKeys, countriesArr]);
 
   return (
     <div className="App">
-      <Row gutter={16}>
-        <Col span={12}>
-          <Card
-            className="border-round"
-            title={
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Title level={3}>List of countries</Title>
-                <Input
-                  style={{ width: "50%" }}
-                  placeholder="Search name or capital"
-                  prefix={<SearchOutlined />}
-                  value={searchText}
-                  onChange={handleOnSearch}
-                />
-              </div>
-            }
-          >
-            <Table
-              className="table-striped-rows"
-              style={{ width: "100%" }}
-              rowSelection={rowSelection}
-              dataSource={filteredCountriesArr}
-              columns={countriesTableColumn}
-              scroll={{ y: 500 }}
-            />
-          </Card>
-        </Col>
-        <Col span={12}>
-          <Card className="border-round">
-            {faveCountriesArr ? (
-              <Chart
-                height={"690px"}
-                chartType="Bar"
-                loader={<Skeleton />}
-                data={faveCountriesArr}
-                options={{
-                  // Material chart options
-                  chart: {
-                    title: "Population of Countries",
-                    subtitle: "Based on countries that you selected",
-                  },
-                  hAxis: {
-                    title: "Total Population",
-                    minValue: 0,
-                  },
-                  vAxis: {
-                    title: "Country",
-                  },
-                  bars: "horizontal",
-                  axes: {
-                    y: {
-                      15: { side: "right" },
-                    },
-                  },
-                }}
+      <div className="app-container">
+        <Card
+          className="border-round"
+          title={
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexFlow: "wrap",
+              }}
+            >
+              <Title level={3}>List of countries</Title>
+              <Input
+                style={{ width: "50%" }}
+                placeholder="Search name or capital"
+                prefix={<SearchOutlined />}
+                value={searchedText}
+                onChange={handleOnSearch}
               />
-            ) : (
-              <b> Select country to see the population</b>
-            )}
-          </Card>
-        </Col>
-      </Row>
+            </div>
+          }
+        >
+          <Table
+            className="table-striped-rows"
+            style={{ width: "100%" }}
+            rowSelection={rowSelection}
+            dataSource={filteredCountriesArr}
+            columns={countriesTableColumn}
+            scroll={{ y: 500 }}
+          />
+        </Card>
+
+        <Card
+          className={
+            faveCountriesArr ? "border-round" : "empty-favorites border-round"
+          }
+        >
+          {faveCountriesArr ? (
+            <BarGraph faveCountriesArr={faveCountriesArr} />
+          ) : (
+            <b>Select country to see the chart population</b>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }
