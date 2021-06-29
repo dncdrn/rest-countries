@@ -4,12 +4,10 @@ import "antd/dist/antd.css";
 
 import Dashboard from "./page/Dashboard";
 
-function App() {
+export default function App() {
   return (
     <div className="App">
       <Dashboard />
     </div>
   );
 }
-
-export default App;
