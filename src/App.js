@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Highlighter from "react-highlight-words";
 import Chart from "react-google-charts";
-import { Avatar, Col, Input, Row, Skeleton, Space, Table } from "antd";
+import { Avatar, Card, Col, Input, Row, Skeleton, Space, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getAllCountries } from "./service/countriesAPI";
 import "./App.css";
 import "antd/dist/antd.css";
+import Title from "antd/lib/typography/Title";
 
 function App() {
   const favorites = JSON.parse(localStorage.getItem("favorites"));
@@ -20,14 +21,7 @@ function App() {
       title: "Flag",
       dataIndex: "flag",
       key: "flag",
-      render: (flag) => (
-        <Avatar
-          style={{ width: "20%" }}
-          shape="square"
-          size="large"
-          src={flag}
-        />
-      ),
+      render: (flag) => <Avatar shape="square" size="large" src={flag} />,
     },
     {
       title: "Country",
@@ -123,51 +117,65 @@ function App() {
   return (
     <div className="App">
       <Row gutter={16}>
-        <Col span={selectedRowKeyss.length ? 12 : 24}>
-          <Space direction="vertical">
-            <Input
-              placeholder="Search name or capital"
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={handleOnSearch}
-            />
+        <Col span={12}>
+          <Card
+            className="border-round"
+            title={
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Title level={3}>List of countries</Title>
+                <Input
+                  style={{ width: "50%" }}
+                  placeholder="Search name or capital"
+                  prefix={<SearchOutlined />}
+                  value={searchText}
+                  onChange={handleOnSearch}
+                />
+              </div>
+            }
+          >
             <Table
+              className="table-striped-rows"
+              style={{ width: "100%" }}
               rowSelection={rowSelection}
               dataSource={filteredCountriesArr}
               columns={countriesTableColumn}
               scroll={{ y: 500 }}
             />
-          </Space>
+          </Card>
         </Col>
-        <Col span={selectedRowKeyss.length ? 12 : 0}>
-          {selectedRowKeyss.length && (
-            <Chart
-              height={"600px"}
-              chartType="Bar"
-              loader={<Skeleton />}
-              data={faveCountriesArr}
-              options={{
-                // Material chart options
-                chart: {
-                  title: "Population of Countries",
-                  subtitle: "Based on countries that you selected",
-                },
-                hAxis: {
-                  title: "Total Population",
-                  minValue: 0,
-                },
-                vAxis: {
-                  title: "Country",
-                },
-                bars: "horizontal",
-                axes: {
-                  y: {
-                    15: { side: "right" },
+        <Col span={12}>
+          <Card className="border-round">
+            {faveCountriesArr ? (
+              <Chart
+                height={"690px"}
+                chartType="Bar"
+                loader={<Skeleton />}
+                data={faveCountriesArr}
+                options={{
+                  // Material chart options
+                  chart: {
+                    title: "Population of Countries",
+                    subtitle: "Based on countries that you selected",
                   },
-                },
-              }}
-            />
-          )}
+                  hAxis: {
+                    title: "Total Population",
+                    minValue: 0,
+                  },
+                  vAxis: {
+                    title: "Country",
+                  },
+                  bars: "horizontal",
+                  axes: {
+                    y: {
+                      15: { side: "right" },
+                    },
+                  },
+                }}
+              />
+            ) : (
+              <b> Select country to see the population</b>
+            )}
+          </Card>
         </Col>
       </Row>
     </div>

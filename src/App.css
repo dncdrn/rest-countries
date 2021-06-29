@@ -1,8 +1,10 @@
 .App {
-  text-align: center;
   padding: 50px;
 }
 
+.border-round {
+  border-radius: 20px !important;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -36,4 +38,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+.table-striped-rows tr:nth-child(2n) td {
+  background-color: #fbfbfb;
+}
+.table-striped-rows thead {
+  background-color: #f1f1f1;
 }
