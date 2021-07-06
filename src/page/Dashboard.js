@@ -15,23 +15,31 @@ export default function Dashboard() {
   const [faveCountriesArr, setFaveCountriesArr] = useState();
   const [isTableLoading, setIsTableLoading] = useState(true);
 
+  // componentDidMount
   useEffect(() => {
     (async function () {
       const countriesResult = await getAllCountries();
+      // adding keys on array object
       countriesResult.forEach(function (element, index) {
         element.key = index;
       });
       setIsTableLoading(false);
+      // this is for holding the array of countries
       setCountriesArr(countriesResult);
+      // this is for showing the filtered array in table
       setFilteredCountriesArr(countriesResult);
     })();
   }, []);
 
+  // componentDidUpdate
   useEffect(() => {
+    // when there is selected record or checked country
     if (countriesArr && selectedCountryKeys && selectedCountryKeys.length) {
+      // filtering the countriesArr if selectedCountryKeys match the country key on countriesArr
       const selectedCountriesArr = countriesArr.filter((country) =>
         selectedCountryKeys.includes(country.key)
       );
+      // forming the data that needed for the graph
       const faveCountriesBarGraphDataFormat = selectedCountriesArr.map(
         (country) => [country.name, country.population]
       );
@@ -54,7 +62,6 @@ export default function Dashboard() {
           />
         }
       >
-        
         <CountryTable
           isTableLoading={isTableLoading}
           selectedCountryKeys={selectedCountryKeys}

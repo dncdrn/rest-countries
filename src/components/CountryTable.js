@@ -10,11 +10,15 @@ export default function CountryTable({
   filteredCountriesArr,
   setSelectedCountryKeys,
 }) {
+  // column for table
   const countriesTableColumn = [
     {
       title: "Flag",
+      // Display field of the data record, support nest path by string array
       dataIndex: "flag",
+      // Unique key of this column, you can ignore this prop if you've set a unique dataIndex
       key: "flag",
+      // Renderer of the table cell.
       render: (flag) => <Avatar shape="square" size="large" src={flag} />,
     },
     {
@@ -32,13 +36,20 @@ export default function CountryTable({
         ) : (
           name
         ),
+      // Sort function for local sort, see Array.sort's compareFunction.
       sorter: (a, b) => a.name.localeCompare(b.name),
+      // Supported sort way, override sortDirections in Table, could be ascend, descend
       sortDirections: ["descend"],
     },
     {
       title: "Region",
       dataIndex: "region",
       key: "region",
+      filters: [
+        { text: "Americas", value: "Americas" },
+        { text: "Asia", value: "Asia" },
+      ],
+      onFilter: (value, record) => record.region.includes(value),
       sorter: (a, b) => a.region.localeCompare(b.region),
       sortDirections: ["descend"],
     },
@@ -61,8 +72,11 @@ export default function CountryTable({
     },
   ];
   const rowSelection = {
+    // can be radio or checkbox
     type: "checkbox",
+    // Controlled selected row keys
     selectedRowKeys: selectedCountryKeys,
+    // Callback executed when selected rows change
     onChange: onSelectChange,
   };
   const tableLoading = {
@@ -70,6 +84,7 @@ export default function CountryTable({
     indicator: <LoadingOutlined style={{ fontSize: 60 }} spin />,
   };
   function onSelectChange(selectedRowKeys) {
+    // only accept string
     localStorage.setItem("favorites", JSON.stringify(selectedRowKeys));
     setSelectedCountryKeys(selectedRowKeys);
   }

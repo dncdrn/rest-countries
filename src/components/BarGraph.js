@@ -20,6 +20,7 @@ export default function BarGraph({ faveCountriesArr }) {
         },
         hAxis: {
           title: "Total Population",
+          //Ignored if this is set to a value greater than the minimum x-value of the data.
           minValue: 0,
         },
         vAxis: {
